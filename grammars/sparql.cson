@@ -1,0 +1,115 @@
+name: 'SPARQL (.rq)'
+scopeName: 'sparql-rq-basic'
+type: 'tree-sitter'
+parser: 'tree-sitter-sparql'
+
+fileTypes: ["rq"]
+
+# scopes:
+#  'call_expression > identifier' : 'entity.name.function'
+# This entry means that, in the syntax tree, any identifier node whose parent is a call_expression should be highlighted
+# using three classes: syntax--entity, syntax--name, and syntax--function.
+
+scopes:
+  '''
+    "*",
+    "/",
+    "+",
+    "-"
+  ''' : 'keyword.operator'
+
+# keywords:
+# SELECT, WHERE, UNION, ORDER BY, GROUP BY, OPTIONAL etc
+'basic_keywords' : [
+  { exact: 'SELECT', scopes: 'builtin.keyword' },
+  { exact: 'WHERE', scopes: 'builtin.keyword' },
+  { exact: 'UNION', scopes: 'builtin.keyword' },
+  { exact: 'OPTIONAL', scopes: 'builtin.keyword' },
+  { exact: 'ORDER BY', scopes: 'builtin.keyword' },
+  { exact: 'GROUP BY', scopes: 'builtin.keyword' },
+  { exact: 'AS', scopes: 'builtin.keyword' },
+  { exact: '', scopes: 'builtin.keyword' }
+]
+
+# built in functions and non recognised functions
+# BIND, FILTER, STR etc
+'functions' : [
+  { exact: 'BIND', scopes: 'builtin.keyword.function' },
+  { exact: 'FILTER', scopes: 'builtin.keyword.function' },
+  { exact: 'STR', scopes: 'builtin.keyword.function' },
+  { exact: 'CONCAT', scopes: 'builtin.keyword.function' },
+  { exact: '', scopes: 'builtin.keyword.function' },
+  'function.name.entity'
+]
+
+# PREFIX keyword
+scopes: 'PREFIX' : 'builtin.POP'
+
+# variables:
+# \?[a-zA-Z][a-zA-Z0-9]*
+'variable' : {
+  match: '\?[a-zA-Z][a-zA-Z0-9]*',
+  scopes: 'name.variable'
+}
+
+# prefix names:
+# [a-zA-Z][a-zA-Z0-9]*:
+'prefix_name' : {
+  match: '[a-zA-Z][a-zA-Z0-9]*:',
+  scopes: 'name.variable.POP'
+}
+
+# "strings"
+'string_' : [
+  {
+    match: '\'.*\'',
+    scopes: 'string.quoted.single'
+  }
+  {
+    match: '".*"',
+    scopes: 'string.quoted.double'
+  }
+]
+
+# numbers
+'numeric_' : [
+  {
+    # int
+    match: '-?[0-9]+',
+    scopes: 'type.constant.numeric.decimal.integer'
+  }
+  {
+    # float
+    match: '-?[0-9]*\.[0-9]+',
+    scopes: 'type.constant.numeric.decimal.period.float'
+  }
+]
+
+# #comments 
+comments:
+  start: '#'
+
+# <links#> and <links/>
+'web_link' : {
+  match: '<.*>',
+  scopes: 'POP'
+}
+
+folds : [
+  {
+    # fold SELECT clauses showing only SELECT and variables
+    type: 'SELECT',
+    start: { type: 'WHERE' }
+    end: { type: [ 'ORDER BY', 'GROUP BY', '"}"' ] }
+  }
+  {
+    # anonymous fold: ie. no type
+    start: { type: '"{"', index:0 }
+    end: { type: '"}"', index:-1 }
+  }
+  {
+    start: { type: '"("', index:0 }
+    end: { type: '")"', index:-1 }
+  }
+
+]

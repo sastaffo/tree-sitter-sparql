@@ -1,0 +1,9 @@
+{
+    "name": "tree-sitter-sparql",
+    "version": "0.0.1",
+    "description": "SPARQL langauge support in Atom",
+    "repository" :{
+        "type": "git",
+        "url": 
+    }
+}
